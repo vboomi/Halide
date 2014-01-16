@@ -7,7 +7,8 @@
 # 'make test_apps' checks some of the apps build and run (but does not check their output)
 
 CXX ?= g++
-LLVM_CONFIG ?= llvm-config
+#LLVM_CONFIG ?= llvm-config
+LLVM_CONFIG ?= llvm-config-3.3
 LLVM_COMPONENTS= $(shell $(LLVM_CONFIG) --components)
 LLVM_VERSION = $(shell $(LLVM_CONFIG) --version | cut -b 1-3)
 CLANG ?= clang
