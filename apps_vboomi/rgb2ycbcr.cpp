@@ -32,8 +32,6 @@ int main(int argc, char **argv){
 	Func yCbCr("yCbCr");
 	yCbCr(x,y,c) = cast<uint8_t>(T(0,c)*rgbInput(x,y,0) + T(1,c)*rgbInput(x,y,1) + T(2,c)*rgbInput(x,y,2) + offset(c) + 0.5f); // additional 0.5 is to implement round() rather than floor() while type casting
 	
-//	yCbCr.trace_stores();
-	
 	Image<uint8_t> yCbCrOutput = yCbCr.realize(rgbInput.width(), rgbInput.height(), rgbInput.channels());
 	
 	save(yCbCrOutput, "yCbCr_parrot.png");
