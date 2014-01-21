@@ -18,7 +18,7 @@ int main(int argc, char **argv){
 	Image<uint8_t> rgbInput = load<uint8_t>("../apps/images/rgb.png");
 	
 	Func T("T");
-	T(x,y) = cast<float>(0);
+	T(x,y) = 0.0f;
 	T(0,0) = 65.481f; T(1,0) = 128.533f; T(2,0) = 24.966f;
 	T(0,1) = -37.797f; T(1,1) = -74.203f; T(2,1) = 112.0f;
 	T(0,2) = 112.0f; T(1,2) = -93.786f; T(2,2) = -18.214f;
