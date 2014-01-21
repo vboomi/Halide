@@ -24,7 +24,7 @@ int main(int argc, char **argv){
 	T(0,2) = 112.0f; T(1,2) = -93.786f; T(2,2) = -18.214f;
 	
 	T(x,y) = T(x,y)/255.0f;
-//	T.compute_root();
+	T.compute_root();
 	
 	Func offset("offset");
 	offset(c) = 0;
@@ -33,11 +33,15 @@ int main(int argc, char **argv){
 	Func yCbCr("yCbCr");
 	yCbCr(x,y,c) = cast<uint8_t>(T(0,c)*rgbInput(x,y,0) + T(1,c)*rgbInput(x,y,1) + T(2,c)*rgbInput(x,y,2) + offset(c) + 0.5f); // additional 0.5 is to implement round() rather than floor() while type casting
 	
-	yCbCr.trace_stores();
+/*	yCbCr.trace_stores();
 	T.trace_stores();
-	T.trace_loads();
+//	T.trace_loads();
+*/
+	Var fuseXY;
+	yCbCr.fuse(x,y,fuseXY);
+//	yCbCr.parallel(fuseXY);
 	
-	Image<uint8_t> yCbCrOutput = yCbCr.realize(2,2,3); //rgbInput.width(), rgbInput.height(), rgbInput.channels());
+	Image<uint8_t> yCbCrOutput = yCbCr.realize(rgbInput.width(), rgbInput.height(), rgbInput.channels());
 	
 	save(yCbCrOutput, "yCbCr_parrot.png");
 	
