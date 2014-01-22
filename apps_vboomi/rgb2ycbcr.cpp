@@ -63,7 +63,13 @@ int main(int argc, char **argv){
 //	offset.trace_stores();
 //	T.trace_loads();
 
-	Image<uint8_t> yCbCrOutput;
+	Image<uint8_t> yCbCrOutput = yCbCr.realize(width, height, rgbInput.channels());
+	printf("Successfully converted.\n");
+
+	save(yCbCrOutput, "yCbCr_parrot.png");
+	printf("Successfully saved.\n");
+
+/*	Image<uint8_t> yCbCrOutput;
 	
 	double t1 = currentTime();
 	int	numIters = 10;
@@ -75,9 +81,9 @@ int main(int argc, char **argv){
 	double t2 = currentTime();
 	printf("It took %f ms to complete\n",(t2-t1)/numIters);
 	
-	save(yCbCrOutput, "yCbCr_parrot.png");
-	
-	printf("Successfully converted.\n");
+	yCbCr.compile_to_c("cpp_rgb2ycbcr.cpp", std::vector<Argument>(), "rgb2ycbcr");
+*/	
+		
 	return 0;
 
 }
