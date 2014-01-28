@@ -142,10 +142,10 @@ BIN_DIR = bin
 DISTRIB_DIR=distrib
 endif
 
-SOURCE_FILES = CodeGen.cpp CodeGen_Internal.cpp CodeGen_X86.cpp CodeGen_GPU_Host.cpp CodeGen_PTX_Dev.cpp CodeGen_OpenCL_Dev.cpp CodeGen_SPIR_Dev.cpp CodeGen_GPU_Dev.cpp CodeGen_Posix.cpp CodeGen_ARM.cpp IR.cpp IRMutator.cpp IRPrinter.cpp IRVisitor.cpp CodeGen_C.cpp Substitute.cpp ModulusRemainder.cpp Bounds.cpp Derivative.cpp OneToOne.cpp Func.cpp Simplify.cpp IREquality.cpp Util.cpp Function.cpp IROperator.cpp Lower.cpp Debug.cpp Parameter.cpp Reduction.cpp RDom.cpp Profiling.cpp Tracing.cpp StorageFlattening.cpp VectorizeLoops.cpp UnrollLoops.cpp BoundsInference.cpp IRMatch.cpp StmtCompiler.cpp integer_division_table.cpp SlidingWindow.cpp StorageFolding.cpp InlineReductions.cpp RemoveTrivialForLoops.cpp Deinterleave.cpp DebugToFile.cpp Type.cpp JITCompiledModule.cpp EarlyFree.cpp UniquifyVariableNames.cpp CSE.cpp Tuple.cpp Lerp.cpp Target.cpp SkipStages.cpp SpecializeClampedRamps.cpp RemoveUndef.cpp FastIntegerDivide.cpp
+SOURCE_FILES = CodeGen.cpp CodeGen_Internal.cpp CodeGen_X86.cpp CodeGen_GPU_Host.cpp CodeGen_PTX_Dev.cpp CodeGen_OpenCL_Dev.cpp CodeGen_SPIR_Dev.cpp CodeGen_GPU_Dev.cpp CodeGen_Posix.cpp CodeGen_ARM.cpp IR.cpp IRMutator.cpp IRPrinter.cpp IRVisitor.cpp CodeGen_C.cpp Substitute.cpp ModulusRemainder.cpp Bounds.cpp Derivative.cpp OneToOne.cpp Func.cpp Simplify.cpp IREquality.cpp Util.cpp Function.cpp IROperator.cpp Lower.cpp Debug.cpp Parameter.cpp Reduction.cpp RDom.cpp Profiling.cpp Tracing.cpp StorageFlattening.cpp VectorizeLoops.cpp UnrollLoops.cpp BoundsInference.cpp IRMatch.cpp StmtCompiler.cpp integer_division_table.cpp SlidingWindow.cpp StorageFolding.cpp InlineReductions.cpp RemoveTrivialForLoops.cpp Deinterleave.cpp DebugToFile.cpp Type.cpp JITCompiledModule.cpp EarlyFree.cpp UniquifyVariableNames.cpp CSE.cpp Tuple.cpp Lerp.cpp Target.cpp SkipStages.cpp SpecializeClampedRamps.cpp RemoveUndef.cpp FastIntegerDivide.cpp AllocationBoundsInference.cpp Inline.cpp Qualify.cpp UnifyDuplicateLets.cpp
 
 # The externally-visible header files that go into making Halide.h. Don't include anything here that includes llvm headers.
-HEADER_FILES = Util.h Type.h Argument.h Bounds.h BoundsInference.h Buffer.h buffer_t.h CodeGen_C.h CodeGen.h CodeGen_X86.h CodeGen_GPU_Host.h CodeGen_PTX_Dev.h CodeGen_OpenCL_Dev.h CodeGen_SPIR_Dev.h CodeGen_GPU_Dev.h Deinterleave.h Derivative.h OneToOne.h Extern.h Func.h Function.h Image.h InlineReductions.h integer_division_table.h IntrusivePtr.h IREquality.h IR.h IRMatch.h IRMutator.h IROperator.h IRPrinter.h IRVisitor.h JITCompiledModule.h Lambda.h Debug.h Lower.h MainPage.h ModulusRemainder.h Parameter.h Param.h RDom.h Reduction.h RemoveTrivialForLoops.h Schedule.h Scope.h Simplify.h SlidingWindow.h StmtCompiler.h StorageFlattening.h StorageFolding.h Substitute.h Profiling.h Tracing.h UnrollLoops.h Var.h VectorizeLoops.h CodeGen_Posix.h CodeGen_ARM.h DebugToFile.h EarlyFree.h UniquifyVariableNames.h CSE.h Tuple.h Lerp.h Target.h SkipStages.h SpecializeClampedRamps.h RemoveUndef.h FastIntegerDivide.h
+HEADER_FILES = Util.h Type.h Argument.h Bounds.h BoundsInference.h Buffer.h buffer_t.h CodeGen_C.h CodeGen.h CodeGen_X86.h CodeGen_GPU_Host.h CodeGen_PTX_Dev.h CodeGen_OpenCL_Dev.h CodeGen_SPIR_Dev.h CodeGen_GPU_Dev.h Deinterleave.h Derivative.h OneToOne.h Extern.h Func.h Function.h Image.h InlineReductions.h integer_division_table.h IntrusivePtr.h IREquality.h IR.h IRMatch.h IRMutator.h IROperator.h IRPrinter.h IRVisitor.h JITCompiledModule.h Lambda.h Debug.h Lower.h MainPage.h ModulusRemainder.h Parameter.h Param.h RDom.h Reduction.h RemoveTrivialForLoops.h Schedule.h Scope.h Simplify.h SlidingWindow.h StmtCompiler.h StorageFlattening.h StorageFolding.h Substitute.h Profiling.h Tracing.h UnrollLoops.h Var.h VectorizeLoops.h CodeGen_Posix.h CodeGen_ARM.h DebugToFile.h EarlyFree.h UniquifyVariableNames.h CSE.h Tuple.h Lerp.h Target.h SkipStages.h SpecializeClampedRamps.h RemoveUndef.h FastIntegerDivide.h AllocationBoundsInference.h Inline.h Qualify.h UnifyDuplicateLets.h
 
 SOURCES = $(SOURCE_FILES:%.cpp=src/%.cpp)
 OBJECTS = $(SOURCE_FILES:%.cpp=$(BUILD_DIR)/%.o)
@@ -237,6 +237,8 @@ PERFORMANCE_TESTS = $(shell ls test/performance/*.cpp)
 ERROR_TESTS = $(shell ls test/error/*.cpp)
 TUTORIALS = $(shell ls tutorial/*.cpp)
 
+STATIC_TEST_CXX ?= $(CXX)
+
 LD_PATH_SETUP = DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:../$(BIN_DIR) LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:../$(BIN_DIR)
 LD_PATH_SETUP2 = DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:../../$(BIN_DIR) LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:../../$(BIN_DIR)
 
@@ -277,7 +279,7 @@ tmp/static/%.o: $(BIN_DIR)/static_%_generate
 	@-echo
 
 $(BIN_DIR)/static_%_test: test/static/%_test.cpp $(BIN_DIR)/static_%_generate tmp/static/%.o include/HalideRuntime.h
-	$(CXX) $(TEST_CXX_FLAGS) $(OPTIMIZE) -I tmp/static -I apps/support tmp/static/$*.o $< -lpthread -ldl $(STATIC_TEST_LIBS) -o $@
+	$(STATIC_TEST_CXX) $(TEST_CXX_FLAGS) $(OPTIMIZE) -I tmp/static -I apps/support tmp/static/$*.o $< -lpthread $(STATIC_TEST_LIBS) -o $@
 
 $(BIN_DIR)/tutorial_%: tutorial/%.cpp $(BIN_DIR)/libHalide.so include/Halide.h
 	$(CXX) $(TEST_CXX_FLAGS) $(LIBPNG_CXX_FLAGS) $(OPTIMIZE) $< -Iinclude -L$(BIN_DIR) -lHalide -lpthread -ldl $(LIBPNG_LIBS) -o $@
@@ -289,7 +291,7 @@ test_%: $(BIN_DIR)/test_%
 
 static_%: $(BIN_DIR)/static_%_test
 	@-mkdir -p tmp
-	cd tmp ; $(LD_PATH_SETUP) ../$<
+	cd tmp ; $(LD_PATH_SETUP) $(STATIC_TEST_RUNNER) ../$<
 	@-echo
 
 valgrind_%: $(BIN_DIR)/test_%

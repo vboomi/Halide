@@ -238,7 +238,7 @@ private:
                 name = name + '.' + int_to_string(call->value_index);
 
             }
-            
+
             // Promote the type to be a multiple of 8 bits
             Type t = call->type;
             t.bits = t.bytes() * 8;
